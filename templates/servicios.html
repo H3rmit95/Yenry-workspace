@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block titulo %}Servicios · La Melena de Yenry{% endblock %}
+
+{% macro form_servicio(s=None) %}
+  <form class="barbero-form" method="post" action="{{ url_for('servicios_guardar') }}">
+    <input type="hidden" name="id" value="{{ s.id if s else '' }}">
+    <div class="sf-grid">
+      <div class="field">
+        <label>Nombre del servicio</label>
+        <input type="text" name="nombre" value="{{ s.nombre if s else '' }}" placeholder="Ej. Corte clásico" required>
+      </div>
+      <div class="field">
+        <label>Precio ($)</label>
+        <input type="number" name="precio" min="0" step="1" value="{{ s.precio if s else '' }}" placeholder="12" required>
+      </div>
+      <div class="field">
+        <label>Duración (min)</label>
+        <input type="number" name="duracion" min="5" step="5" value="{{ s.duracion if s else '' }}" placeholder="30" required>
+      </div>
+    </div>
+    <div class="field" style="margin-top:1rem">
+      <label>Descripción</label>
+      <input type="text" name="desc" value="{{ s.desc if s else '' }}" placeholder="Breve descripción del servicio">
+    </div>
+    <div class="bf-acciones" style="margin-top:1rem">
+      <button type="submit" class="btn btn-sm">{{ 'Guardar cambios' if s else 'Agregar servicio' }}</button>
+    </div>
+  </form>
+{% endmacro %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="titulo-seccion">
+    <h2>Servicios y precios</h2>
+    <p>Agrega, edita o elimina los servicios que ofrece la barbería.</p>
+  </div>
+
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensajes %}
+      <div class="flash flash-{{ categoria }}">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="barbero-card nuevo">
+    <h3>➕ Nuevo servicio</h3>
+    {{ form_servicio() }}
+  </div>
+
+  {% for s in servicios %}
+  <div class="barbero-card">
+    <div class="barbero-head">
+      <h3>{{ s.nombre }}</h3>
+      <span class="horario-badge">${{ s.precio }} · {{ s.duracion }} min</span>
+      <span class="contador">{{ s.citas }} cita(s)</span>
+    </div>
+    {{ form_servicio(s) }}
+    <form method="post" action="{{ url_for('servicios_eliminar', sid=s.id) }}"
+          onsubmit="return confirm('¿Eliminar «{{ s.nombre }}»?');" class="del-form">
+      <button class="btn btn-sm btn-danger" {{ 'disabled' if s.citas > 0 }}>Eliminar</button>
+    </form>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}

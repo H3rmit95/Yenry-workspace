@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titulo %}Calendario · La Melena de Yenry{% endblock %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="cal-head">
+    <h2>{{ nombre_mes }} {{ anio }}</h2>
+    <div style="display:flex;gap:0.5rem">
+      <a class="btn btn-light btn-sm" href="{{ url_for('calendario', anio=nav_prev.anio, mes=nav_prev.mes) }}">← Anterior</a>
+      <a class="btn btn-light btn-sm" href="{{ url_for('calendario') }}">Hoy</a>
+      <a class="btn btn-light btn-sm" href="{{ url_for('calendario', anio=nav_sig.anio, mes=nav_sig.mes) }}">Siguiente →</a>
+      <a class="btn btn-sm" href="{{ url_for('agendar') }}">+ Nueva cita</a>
+    </div>
+  </div>
+
+  <div class="cal-grid">
+    {% for d in dias_semana %}<div class="cal-dow">{{ d }}</div>{% endfor %}
+
+    {% for semana in semanas %}
+      {% for celda in semana %}
+      <div class="cal-cell {{ 'fuera' if not celda.del_mes }} {{ 'hoy' if celda.es_hoy }}">
+        <span class="n">{{ celda.dia }}</span>
+        {% for c in celda.citas %}
+          {% set s = servicio_por_id(c.servicio_id) %}
+          <div class="cal-evt" title="{{ c.cliente }} · {{ s.nombre }} · {{ c.barbero }}">
+            <span class="h">{{ c.hora }}</span> {{ c.cliente }}<br>{{ s.nombre }}
+          </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block titulo %}Inicio · La Melena de Yenry{% endblock %}
+
+{% block contenido %}
+<section class="wrap hero">
+  <div>
+    <h1>Tu mejor versión<br>empieza en la silla</h1>
+    <p class="sub">El CRM #1 para gestionar tu barbería</p>
+    <p>Agenda citas, organiza tu calendario y controla tus servicios desde un solo lugar. Simple, rápido y con estilo.</p>
+    <div class="cta">
+      <a href="{{ url_for('agendar') }}" class="btn">Agendar cita →</a>
+      <a href="{{ url_for('cortes') }}" class="btn btn-light">Ver cortes y precios</a>
+    </div>
+  </div>
+  <div class="hero-grid">
+    <div class="tile">💈</div><div class="tile">✂️</div><div class="tile">🧔</div>
+    <div class="tile">🪒</div><div class="tile">💇</div><div class="tile">🧴</div>
+    <div class="tile">⭐</div><div class="tile">📅</div><div class="tile">💈</div>
+  </div>
+</section>
+
+{% if por_recordar %}
+<section class="wrap" style="padding-top:1.5rem">
+  <a class="rec-aviso" href="{{ url_for('recordatorios') }}">
+    🔔 Tienes <strong>{{ por_recordar }}</strong> recordatorio(s) por enviar. <span>Ir al panel →</span>
+  </a>
+</section>
+{% endif %}
+
+<section class="wrap seccion">
+  <div class="stats">
+    <div class="stat">
+      <div class="num">{{ citas_hoy|length }}</div>
+      <div class="lbl">Citas para hoy</div>
+    </div>
+    <div class="stat">
+      <div class="num">{{ total_citas }}</div>
+      <div class="lbl">Citas activas en total</div>
+    </div>
+    <div class="stat">
+      <div class="num">${{ ingresos_hoy }}</div>
+      <div class="lbl">Ingreso estimado de hoy</div>
+    </div>
+  </div>
+</section>
+
+<section class="banda">
+  <div class="wrap seccion">
+    <div class="titulo-seccion">
+      <h2>Agenda de hoy</h2>
+      <p>Las citas programadas para la fecha actual</p>
+    </div>
+    {% if citas_hoy %}
+    <div class="lista">
+      {% for c in citas_hoy %}
+        {% set s = servicio_por_id(c.servicio_id) %}
+        <div class="cita-row">
+          <div class="info">
+            <div class="hora">{{ c.hora }}</div>
+            <div class="det">
+              <strong>{{ c.cliente }}</strong><br>
+              <small>{{ s.nombre }} · {{ c.barbero }} · {{ c.telefono }}</small>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem">
+            <span class="precio" style="font-size:1.3rem">${{ s.precio }}</span>
+            <form method="post" action="{{ url_for('eliminar', cita_id=c.id) }}">
+              <button class="btn btn-sm btn-danger">Cancelar</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="vacio">No hay citas para hoy. <a href="{{ url_for('agendar') }}" style="color:var(--dorado-hover);font-weight:600">Agendar una →</a></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

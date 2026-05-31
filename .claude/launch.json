@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "barberia",
+      "runtimeExecutable": "C:\\Users\\yenry\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "runtimeArgs": ["app.py"],
+      "port": 5000
+    }
+  ]
+}

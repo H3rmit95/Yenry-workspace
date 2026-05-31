@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titulo %}Reportes · La Melena de Yenry{% endblock %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="cal-head">
+    <h2>Ingresos · {{ nombre_mes }} {{ anio }}</h2>
+    <div style="display:flex;gap:0.5rem">
+      <a class="btn btn-light btn-sm" href="{{ url_for('reportes', anio=nav_prev.anio, mes=nav_prev.mes) }}">← Anterior</a>
+      <a class="btn btn-light btn-sm" href="{{ url_for('reportes') }}">Este mes</a>
+      <a class="btn btn-light btn-sm" href="{{ url_for('reportes', anio=nav_sig.anio, mes=nav_sig.mes) }}">Siguiente →</a>
+      <a class="btn btn-sm" href="{{ url_for('reportes_export', anio=anio, mes=mes) }}">⬇ Exportar CSV</a>
+    </div>
+  </div>
+
+  <div class="cd-stats rep-stats">
+    <div class="stat"><span class="num">${{ resumen.ingresos }}</span><span class="lbl">Ingresos del mes</span></div>
+    <div class="stat"><span class="num">{{ resumen.citas }}</span><span class="lbl">Citas del mes</span></div>
+    <div class="stat"><span class="num">${{ resumen.ticket }}</span><span class="lbl">Ticket promedio</span></div>
+    <div class="stat"><span class="num">${{ total_historico }}</span><span class="lbl">Histórico total</span></div>
+  </div>
+
+  <div class="rep-cols">
+    <div class="barbero-card">
+      <h3>Ingresos por barbero</h3>
+      {% if por_barbero %}
+      <div class="rep-lista">
+        {% for b in por_barbero %}
+        <div class="rep-fila">
+          <div class="rep-top">
+            <span class="rep-nombre">{{ b.barbero }}</span>
+            <span class="rep-monto">${{ b.ingresos }} <small>· {{ b.citas }} cita(s)</small></span>
+          </div>
+          <div class="rep-barra"><span style="width: {{ (b.ingresos / max_barbero * 100) if max_barbero else 0 }}%"></span></div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="vacio">Sin citas este mes.</p>
+      {% endif %}
+    </div>
+
+    <div class="barbero-card">
+      <h3>Ingresos por servicio</h3>
+      {% if por_servicio %}
+      <div class="rep-lista">
+        {% for s in por_servicio %}
+        <div class="rep-fila">
+          <div class="rep-top">
+            <span class="rep-nombre">{{ s.servicio }}</span>
+            <span class="rep-monto">${{ s.ingresos }} <small>· {{ s.veces }}×</small></span>
+          </div>
+          <div class="rep-barra"><span style="width: {{ (s.ingresos / max_servicio * 100) if max_servicio else 0 }}%"></span></div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="vacio">Sin citas este mes.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

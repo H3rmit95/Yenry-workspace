@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block titulo %}{{ cliente.nombre }} · Clientes{% endblock %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="titulo-seccion">
+    <a href="{{ url_for('clientes_admin') }}" class="volver">← Volver a clientes</a>
+    <h2>{{ cliente.nombre }}</h2>
+    <p>Cliente desde {{ cliente.creado }}.</p>
+  </div>
+
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensajes %}
+      <div class="flash flash-{{ categoria }}">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="cd-stats">
+    <div class="stat"><span class="num">{{ visitas }}</span><span class="lbl">Visitas</span></div>
+    <div class="stat"><span class="num">${{ total_gastado }}</span><span class="lbl">Total gastado</span></div>
+    <div class="stat"><span class="num">{{ citas[0].fecha if citas else '—' }}</span><span class="lbl">Última visita</span></div>
+  </div>
+
+  <div class="barbero-card">
+    <h3>Datos del cliente</h3>
+    <form class="barbero-form" method="post" action="{{ url_for('clientes_guardar') }}">
+      <input type="hidden" name="id" value="{{ cliente.id }}">
+      <div class="sf-grid">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" name="nombre" value="{{ cliente.nombre }}" required>
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="text" name="telefono" value="{{ cliente.telefono or '' }}" placeholder="809-000-0000">
+        </div>
+      </div>
+      <div class="field" style="margin-top:1rem">
+        <label>Notas</label>
+        <input type="text" name="notas" value="{{ cliente.notas or '' }}" placeholder="Preferencias, alergias, etc.">
+      </div>
+      <div class="bf-acciones" style="margin-top:1rem">
+        <button type="submit" class="btn btn-sm">Guardar cambios</button>
+      </div>
+    </form>
+    <form method="post" action="{{ url_for('clientes_eliminar', cid=cliente.id) }}"
+          onsubmit="return confirm('¿Eliminar a «{{ cliente.nombre }}»?');" class="del-form">
+      <button class="btn btn-sm btn-danger" {{ 'disabled' if visitas > 0 }}>Eliminar</button>
+    </form>
+  </div>
+
+  <div class="barbero-card">
+    <h3>Historial de citas</h3>
+    {% if citas %}
+    <div class="clientes-tabla">
+      <div class="ct-head ct-head-citas">
+        <span>Fecha</span>
+        <span>Hora</span>
+        <span>Servicio</span>
+        <span>Barbero</span>
+        <span>Precio</span>
+      </div>
+      {% for c in citas %}
+      <div class="ct-fila ct-fila-citas">
+        <span>{{ c.fecha }}</span>
+        <span>{{ c.hora }}</span>
+        <span>{{ c.servicio_nombre or '—' }}</span>
+        <span>{{ c.barbero }}</span>
+        <span>${{ c.servicio_precio or 0 }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="vacio">Este cliente aún no tiene citas registradas.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

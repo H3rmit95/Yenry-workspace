@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block titulo %}Recordatorios · La Melena de Yenry{% endblock %}
+
+{% macro rec_card(c, destacar=False) %}
+  <div class="rec-card {{ 'enviado' if c.recordatorio_enviado }} {{ 'destacar' if destacar }}">
+    <div class="rec-cuando">
+      <span class="rec-dia">{{ c.etiqueta }}</span>
+      <span class="rec-hora">{{ c.hora }}</span>
+    </div>
+    <div class="rec-info">
+      <span class="rec-cliente">{{ c.cliente }}{% if c.recordatorio_enviado %} <span class="rec-ok">✓ recordado</span>{% endif %}</span>
+      <span class="rec-detalle">{{ c.servicio_nombre }} · {{ c.barbero }}</span>
+      <span class="rec-tel">{{ c.telefono or 'Sin teléfono' }}</span>
+    </div>
+    <div class="rec-acciones">
+      {% if c.wa %}
+      <a class="btn btn-sm wa-btn" href="{{ c.wa }}" target="_blank" rel="noopener">WhatsApp</a>
+      {% endif %}
+      <form method="post" action="{{ url_for('recordatorios_marcar', cita_id=c.id) }}">
+        <input type="hidden" name="enviado" value="{{ '0' if c.recordatorio_enviado else '1' }}">
+        <button class="btn btn-sm {{ 'btn-light' if c.recordatorio_enviado else '' }}">
+          {{ 'Deshacer' if c.recordatorio_enviado else 'Marcar recordado' }}
+        </button>
+      </form>
+    </div>
+  </div>
+{% endmacro %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="titulo-seccion">
+    <h2>Recordatorios de citas</h2>
+    <p>La app detecta sola qué citas toca recordar. Envía el aviso por WhatsApp y márcalo.</p>
+  </div>
+
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensajes %}
+      <div class="flash flash-{{ categoria }}">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form class="rec-config" method="post" action="{{ url_for('recordatorios_config') }}">
+    <label for="anticipacion">Recordar con</label>
+    <input type="number" id="anticipacion" name="anticipacion" min="0" max="30" value="{{ anticipacion }}">
+    <span>día(s) de anticipación</span>
+    <button type="submit" class="btn btn-sm btn-light">Guardar</button>
+  </form>
+
+  <div class="rec-bloque">
+    <h3 class="rec-titulo">🔔 Por recordar
+      {% if por_recordar %}<span class="rec-badge">{{ por_recordar|length }}</span>{% endif %}
+    </h3>
+    {% if por_recordar %}
+    <div class="rec-lista">
+      {% for c in por_recordar %}{{ rec_card(c, destacar=True) }}{% endfor %}
+    </div>
+    {% else %}
+    <p class="vacio">Nada por recordar dentro de la ventana. ¡Todo al día!</p>
+    {% endif %}
+  </div>
+
+  {% if programadas %}
+  <div class="rec-bloque">
+    <h3 class="rec-titulo">Programadas</h3>
+    <div class="rec-lista">
+      {% for c in programadas %}{{ rec_card(c) }}{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

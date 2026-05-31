@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Cortes y precios · La Melena de Yenry{% endblock %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="titulo-seccion">
+    <h2>Cortes y precios</h2>
+    <p>Nuestros servicios. Elige el tuyo y agenda en segundos.</p>
+  </div>
+
+  {% set emojis = {1:'✂️', 2:'💈', 3:'🧔', 4:'🪒', 5:'🧒', 6:'✨'} %}
+  <div class="grid-cards">
+    {% for s in servicios %}
+    <div class="card">
+      <div class="emoji">{{ emojis.get(s.id, '✂️') }}</div>
+      <h3>{{ s.nombre }}</h3>
+      <p class="desc">{{ s.desc }}</p>
+      <div class="pie">
+        <span class="precio">${{ s.precio }}</span>
+        <span class="duracion">{{ s.duracion }} min</span>
+      </div>
+      <a href="{{ url_for('agendar') }}" class="btn btn-sm" style="margin-top:1rem;width:100%;justify-content:center">Agendar este corte</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

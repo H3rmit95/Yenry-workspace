@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}La Melena de Yenry{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <span>Reservas en línea 24/7</span>
+      <span>Barberos profesionales</span>
+      <span>+2,500 clientes satisfechos</span>
+      <span>Atención en el centro de la ciudad</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="wrap">
+      <a href="{{ url_for('dashboard') }}" class="brand">
+        <span class="logo"></span>
+        <span class="serif">La Melena de Yenry</span>
+      </a>
+      <div class="menu">
+        <a href="{{ url_for('dashboard') }}" class="{{ 'activo' if seccion=='inicio' }}">Inicio</a>
+        <a href="{{ url_for('cortes') }}" class="{{ 'activo' if seccion=='cortes' }}">Cortes y precios</a>
+        <a href="{{ url_for('calendario') }}" class="{{ 'activo' if seccion=='calendario' }}">Calendario</a>
+        <a href="{{ url_for('servicios_admin') }}" class="{{ 'activo' if seccion=='servicios' }}">Servicios</a>
+        <a href="{{ url_for('barberos_admin') }}" class="{{ 'activo' if seccion=='barberos' }}">Barberos</a>
+        <a href="{{ url_for('clientes_admin') }}" class="{{ 'activo' if seccion=='clientes' }}">Clientes</a>
+        <a href="{{ url_for('reportes') }}" class="{{ 'activo' if seccion=='reportes' }}">Reportes</a>
+        <a href="{{ url_for('recordatorios') }}" class="{{ 'activo' if seccion=='recordatorios' }}">Recordatorios</a>
+        <a href="{{ url_for('agendar') }}" class="btn btn-sm">Agendar cita</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    {% block contenido %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    La Melena de Yenry · CRM interno · Hecho con Flask &amp; Python
+  </footer>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titulo %}Clientes · La Melena de Yenry{% endblock %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="titulo-seccion">
+    <h2>Clientes</h2>
+    <p>Historial y datos de contacto de quienes han reservado en la barbería.</p>
+  </div>
+
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensajes %}
+      <div class="flash flash-{{ categoria }}">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="barbero-card nuevo">
+    <h3>➕ Nuevo cliente</h3>
+    <form class="barbero-form" method="post" action="{{ url_for('clientes_guardar') }}">
+      <div class="sf-grid">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" name="nombre" placeholder="Ej. Juan Rodríguez" required>
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="text" name="telefono" placeholder="809-000-0000">
+        </div>
+      </div>
+      <div class="field" style="margin-top:1rem">
+        <label>Notas</label>
+        <input type="text" name="notas" placeholder="Preferencias, alergias, etc.">
+      </div>
+      <div class="bf-acciones" style="margin-top:1rem">
+        <button type="submit" class="btn btn-sm">Agregar cliente</button>
+      </div>
+    </form>
+  </div>
+
+  {% if clientes %}
+  <div class="clientes-tabla">
+    <div class="ct-head">
+      <span>Cliente</span>
+      <span>Teléfono</span>
+      <span>Visitas</span>
+      <span>Gastado</span>
+      <span>Última visita</span>
+    </div>
+    {% for c in clientes %}
+    <a class="ct-fila" href="{{ url_for('cliente_detalle', cid=c.id) }}">
+      <span class="ct-nombre">{{ c.nombre }}</span>
+      <span>{{ c.telefono or '—' }}</span>
+      <span>{{ c.visitas }}</span>
+      <span>${{ c.total_gastado }}</span>
+      <span>{{ c.ultima_visita or '—' }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="vacio">Aún no hay clientes registrados. Agenda una cita o agrega uno arriba.</p>
+  {% endif %}
+</section>
+{% endblock %}

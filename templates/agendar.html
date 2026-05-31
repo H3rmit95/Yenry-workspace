@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block titulo %}Agendar cita · La Melena de Yenry{% endblock %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="titulo-seccion">
+    <h2>Agendar una cita</h2>
+    <p>Completa los datos y reserva el turno en segundos.</p>
+    <div class="horarios">
+      {% for b in barberos %}
+      <span class="horario-badge">🕒 <strong>{{ b.nombre }}</strong>: {{ b.horario }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="alerta">⚠️ {{ error }}</div>
+  {% endif %}
+
+  <form class="form-card" method="post" action="{{ url_for('agendar') }}">
+    <div class="form-grid">
+      <div class="field full">
+        <label for="cliente">Nombre del cliente</label>
+        <input type="text" id="cliente" name="cliente" list="lista-clientes" placeholder="Ej. Juan Rodríguez" value="{{ valores.cliente if valores }}" required>
+        <datalist id="lista-clientes">
+          {% for c in clientes %}<option value="{{ c.nombre }}">{% endfor %}
+        </datalist>
+      </div>
+      <div class="field">
+        <label for="telefono">Teléfono</label>
+        <input type="text" id="telefono" name="telefono" placeholder="809-000-0000" value="{{ valores.telefono if valores }}">
+      </div>
+      <div class="field">
+        <label for="barbero">Barbero</label>
+        <select id="barbero" name="barbero">
+          {% for b in barberos %}<option value="{{ b.nombre }}" {{ 'selected' if valores and valores.barbero == b.nombre }}>{{ b.nombre }} ({{ b.horario }})</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field full">
+        <label for="servicio_id">Servicio</label>
+        <select id="servicio_id" name="servicio_id">
+          {% for s in servicios %}
+          <option value="{{ s.id }}" {{ 'selected' if valores and valores.servicio_id == s.id }}>{{ s.nombre }} — ${{ s.precio }} ({{ s.duracion }} min)</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha" name="fecha" value="{{ valores.fecha if valores else hoy }}" required>
+      </div>
+      <div class="field">
+        <label for="hora">Hora</label>
+        <input type="time" id="hora" name="hora" min="{{ apertura }}" max="{{ cierre }}" value="{{ valores.hora if valores else '10:00' }}" required>
+      </div>
+    </div>
+    <button type="submit" class="btn" style="margin-top:1.6rem;width:100%;justify-content:center">Confirmar cita</button>
+  </form>
+</section>
+{% endblock %}

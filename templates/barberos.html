@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block titulo %}Barberos · La Melena de Yenry{% endblock %}
+
+{% macro form_barbero(b=None) %}
+  <form class="barbero-form" method="post" action="{{ url_for('barberos_guardar') }}">
+    <input type="hidden" name="id" value="{{ b.id if b else '' }}">
+    <div class="bf-grid">
+      <div class="field">
+        <label>Nombre</label>
+        <input type="text" name="nombre" value="{{ b.nombre if b else '' }}" placeholder="Nombre del barbero" required>
+      </div>
+      <div class="field">
+        <label>Abre</label>
+        <input type="time" name="apertura" value="{{ b.apertura if b else '09:00' }}" required>
+      </div>
+      <div class="field">
+        <label>Cierra</label>
+        <input type="time" name="cierre" value="{{ b.cierre if b else '19:00' }}" required>
+      </div>
+      <div class="field">
+        <label>Margen (min)</label>
+        <input type="number" name="margen" min="0" step="5" value="{{ b.margen if b else 5 }}" required>
+      </div>
+    </div>
+    <div class="dias-fila">
+      <span class="dias-lbl">Días que trabaja:</span>
+      {% for i, d in dias %}
+        {% set trabaja = (b is none and i != 6) or (b and i not in b.dias_cerrados_set) %}
+        <label class="chip-dia">
+          <input type="checkbox" name="trabaja" value="{{ i }}" {{ 'checked' if trabaja }}>
+          <span>{{ d }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    <div class="bf-acciones">
+      <button type="submit" class="btn btn-sm">{{ 'Guardar cambios' if b else 'Agregar barbero' }}</button>
+    </div>
+  </form>
+{% endmacro %}
+
+{% block contenido %}
+<section class="wrap seccion">
+  <div class="titulo-seccion">
+    <h2>Barberos y horarios</h2>
+    <p>Agrega barberos y define los días y horas en que atiende cada uno.</p>
+  </div>
+
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensajes %}
+      <div class="flash flash-{{ categoria }}">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="barbero-card nuevo">
+    <h3>➕ Nuevo barbero</h3>
+    {{ form_barbero() }}
+  </div>
+
+  {% for b in barberos %}
+  <div class="barbero-card">
+    <div class="barbero-head">
+      <h3>{{ b.nombre }}</h3>
+      <span class="horario-badge">🕒 {{ b.horario }}</span>
+      <span class="horario-badge">⏳ {{ b.margen }} min entre turnos</span>
+      <span class="contador">{{ b.citas }} cita(s)</span>
+    </div>
+    {{ form_barbero(b) }}
+    <form method="post" action="{{ url_for('barberos_eliminar', bid=b.id) }}"
+          onsubmit="return confirm('¿Eliminar a {{ b.nombre }}?');" class="del-form">
+      <button class="btn btn-sm btn-danger" {{ 'disabled' if b.citas > 0 }}>Eliminar</button>
+    </form>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}
